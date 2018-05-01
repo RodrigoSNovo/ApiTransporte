@@ -1,5 +1,7 @@
 package transporte.tcc.a.apitransporte;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
@@ -12,8 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
-
-//https://maps.googleapis.com/maps/api/directions/json?origin=-23.5742561,-46.5819458&destination=-23.550475,-46.5969021&mode=transit&key=AIzaSyDLJdfhDZ3WBZafn_9GwwLJp3w6cM9SHgw
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,45 +38,64 @@ public class MainActivity extends AppCompatActivity {
         btnConsultar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                String response = consultar(partida.getText().toString(),destino.getText().toString());
-                if(response != null){
-                    consultarJSON(response);
-                }
+                new GetCoordinates().execute(partida.getText().toString(),destino.getText().toString());
             }
         });
     }
 
-    protected String consultar(String partida, String destino) {
-        String response;
-        try{
-            HttpDataHandler http = new HttpDataHandler();
-            StringBuilder url = new StringBuilder();
-            url.append("https://maps.googleapis.com/maps/api/directions/json?");
-            url.append("origin=" + partida);
-            url.append("&destination=" + destino);
-            url.append("&mode=transit&key=AIzaSyDLJdfhDZ3WBZafn_9GwwLJp3w6cM9SHgw");
-            response = http.getHttpData(url.toString());
-            return  response;
-        }catch (Exception ex){
+    private class GetCoordinates extends AsyncTask<String,Void,String> {
+
+        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Por Favor, Aguarde....");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String response;
+            try{
+                String partida = strings[0];
+                String destino = strings[1];
+                HttpDataHandler http = new HttpDataHandler();
+                StringBuilder url = new StringBuilder();
+                url.append("https://maps.googleapis.com/maps/api/directions/json?");
+                url.append("origin=" + partida);
+                url.append("&destination=" + destino);
+                url.append("&mode=transit&key=AIzaSyDLJdfhDZ3WBZafn_9GwwLJp3w6cM9SHgw");
+                //String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s",address);
+                response = http.getHttpData(url.toString());
+                return  response;
+            }catch (Exception ex){
+
+            }
             return null;
         }
-    }
 
-    protected void consultarJSON(String s) {
-        try{
-            JSONObject jsonObject = new JSONObject(s);
+        @Override
+        protected void onPostExecute(String s) {
+            try{
+                JSONObject jsonObject = new JSONObject(s);
 
-            String tempo = ((JSONArray)jsonObject.get("routes")).getJSONObject(1).getJSONObject("legs")
-                    .getJSONObject("duration").get("text").toString();
-            String preco = ((JSONArray)jsonObject.get("routes")).getJSONObject(1).getJSONObject("fare")
-                    .get("text").toString();
+                String tempo = ((JSONArray)jsonObject.get("routes")).getJSONObject(4).getJSONObject("legs")
+                        .getJSONObject("duration").get("text").toString();
+                String preco = ((JSONArray)jsonObject.get("routes")).getJSONObject(3).getJSONObject("fare")
+                        .get("text").toString();
 
-            txtResultTempo.setText(String.format("Tempo: %s",tempo));
-            txtResultPreco.setText(String.format("Preço: %s",preco));
+                txtResultTempo.setText(String.format("Tempo: %s",tempo));
+                txtResultPreco.setText(String.format("Preço: %s",preco));
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+                if(dialog.isShowing()){
+                    dialog.dismiss();
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
