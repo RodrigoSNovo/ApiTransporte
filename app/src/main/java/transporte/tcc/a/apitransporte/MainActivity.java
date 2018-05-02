@@ -60,15 +60,14 @@ public class MainActivity extends AppCompatActivity {
             String response;
             try{
                 String partida = strings[0];
-                String destino = strings[1];
                 HttpDataHandler http = new HttpDataHandler();
-                StringBuilder url = new StringBuilder();
-                url.append("https://maps.googleapis.com/maps/api/directions/json?");
-                url.append("origin=" + partida);
-                url.append("&destination=" + destino);
-                url.append("&mode=transit&key=AIzaSyDLJdfhDZ3WBZafn_9GwwLJp3w6cM9SHgw");
-                //String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s",address);
-                response = http.getHttpData(url.toString());
+                //StringBuilder url = new StringBuilder();
+                //url.append("https://maps.googleapis.com/maps/api/directions/json?");
+                //url.append("origin=" + partida);
+                //url.append("&destination=" + destino);
+                //url.append("&mode=transit&key=AIzaSyDLJdfhDZ3WBZafn_9GwwLJp3w6cM9SHgw");
+                String url = "https://maps.googleapis.com/maps/api/directions/json?origin=-23.5742561,-46.5819458&destination=-23.550475,-46.5969021&mode=transit&key=AIzaSyDLJdfhDZ3WBZafn_9GwwLJp3w6cM9SHgw";
+                response = http.getHttpData(url);
                 return  response;
             }catch (Exception ex){
 
@@ -81,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
             try{
                 JSONObject jsonObject = new JSONObject(s);
 
-                String tempo = ((JSONArray)jsonObject.get("routes")).getJSONObject(4).getJSONObject("legs")
+                String tempo = ((JSONArray)jsonObject.get("routes")).getJSONObject(0).getJSONObject("legs")
                         .getJSONObject("duration").get("text").toString();
-                String preco = ((JSONArray)jsonObject.get("routes")).getJSONObject(3).getJSONObject("fare")
+                String preco = ((JSONArray)jsonObject.get("routes")).getJSONObject(0).getJSONObject("fare")
                         .get("text").toString();
 
                 txtResultTempo.setText(String.format("Tempo: %s",tempo));

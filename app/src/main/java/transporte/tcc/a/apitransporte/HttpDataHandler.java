@@ -28,7 +28,7 @@ public class HttpDataHandler {
             conn.setConnectTimeout(15000);
             conn.setDoInput(true);
             conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+            conn.setRequestProperty("Content-Type","application/json; charset=UTF-8");
 
             int responseCode = conn.getResponseCode();
             if(responseCode == HttpsURLConnection.HTTP_OK){
