@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 txtResultTempo.setText(String.format("Tempo: %s",tempo));
                 txtResultPreco.setText(String.format("Preço: %s",preco));
 
+                
                 if(dialog.isShowing()){
                     dialog.dismiss();
                 }
